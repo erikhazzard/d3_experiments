@@ -1,0 +1,48 @@
+{
+    "fields": [
+    {
+        "data_type": "string",
+        "originalColumnName": "Company ",
+        "has_duplicates": false,
+        "label": "Company ",
+        "num_unique": 26,
+        "data": [
+        "Toyota Motor ",
+        "Pfizer ",
+        "Ford Motor "
+        ],
+        "id": "0"
+    },
+    {
+        "data_type": "string",
+        "originalColumnName": "Country",
+        "has_duplicates": true,
+        "label": "Country",
+        "num_unique": 10,
+        "keys": [
+        "jp",
+        "us",
+        "us"
+        ],
+        "id": "1",
+        "data": [
+        "Finland",
+        "France",
+        "Germany"
+        ],
+        "location_type": "countries"
+    },
+    {
+        "data_type": "number",
+        "originalColumnName": "Sales ($millions), 2006",
+        "has_duplicates": false,
+        "label": "Sales ($millions), 2006",
+        "num_unique": 26,
+        "data": [
+        201254,
+        48201,
+        160123
+        ],
+        "id": "2"
+    }]
+}

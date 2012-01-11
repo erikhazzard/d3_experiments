@@ -1,0 +1,26 @@
+svg {
+  border: solid 1px #666;
+  overflow: hidden;
+}
+
+path {
+  fill: yellow;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+circle {
+  fill: #ccc;
+  stroke: #000;
+  pointer-events: none;
+}
+
+#diagram_1 path {
+    fill-opacity: .4;
+    stroke-opacity:.4;
+}
+
+#diagram_2 path {
+    fill-opacity: .7;
+    stroke-opacity:.7;
+}

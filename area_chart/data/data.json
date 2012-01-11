@@ -1,0 +1,10 @@
+{
+    "data": [
+        { "date": "Dec 1", "value": 100 },
+        { "date": "Dec 6", "value": 80 },
+        { "date": "Dec 11", "value": 42 },
+        { "date": "Dec 16", "value": 77 },
+        { "date": "Dec 21", "value": 18 },
+        { "date": "Dec 26", "value": 39 }
+    ]
+}

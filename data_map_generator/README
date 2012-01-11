@@ -1,0 +1,35 @@
+Data Map Generator
+=========================================
+This uses D3 to generate world 'data maps' similar to http://xkcd.com/802/
+It takes in a data file and will create land masses based on the size of the 
+input data
+
+Setup
+=========================================
+All required dependencies are included in the js/libs folder.  To test this 
+application, in terminal run:
+
+python -m SimpleHTTPServer 8888
+
+And then point your browser at localhost:8888/
+
+Overview
+==========================================
+The basic process is:
+-Create a treemap to get the center position of each 'continent'
+    -Slightly randomzie the continent center point so they look slightly more natural
+-Use the force layout with foci points and collison detection to form 'continents' from
+'countries' (individual data points), with sizes porportional to their percentage of
+the total data
+-After the force chart is finshed placing the continents, create a convex hull around
+each continent to create a polygon that more or less represents the total area of the
+continent
+    -When creating the convex hull, pick a bunch of verticies based on each country's 
+    center point and radius, placing each vertex at some angle.  The more verticies, the
+    more 'jaggged' the border will look
+-The next step generated country borders.  At this point we'll use use a similar 
+strategy involving convex hulls (problem would be lining up borders since countries are
+represented by circles), or most likely:
+    -a voronoi diagram with weights to draw the country borders and constrain
+    the rendered diagram to each continent.  We can then randomize the line segements
+    of the voronoi diagram to create jagged country borders

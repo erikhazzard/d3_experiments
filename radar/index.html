@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang='en'>
+<head>
+    <!-- This application can also be used offline.  
+    TODO: Add app cache to head:  manifest='cache.appcache' -->
+    <meta charset='uft-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>Visual.ly Radar Chart</title>
+
+    <!-- Styles -->
+    <!-- TODO: Use node to compile LESSCSS css file -->
+    <link rel='stylesheet/less' type='text/css' href='css/style.less' />
+
+    <!-- Include the less library to compile CSS -->
+    <script src='js/libs/less/less.js'></script>
+</head>
+<body>
+<!-- =====================================================================
+    Site Wrapper
+     ===================================================================== -->
+<div id='site_wrapper'>
+    <div id='header_wrapper'>
+        <div id='header'>
+            <h1>Radar Chart</h1>
+        </div>
+    </div>
+    <div id='radar_container_wrapper'>
+        <div id='radar_container'>
+            <div id='radar_range_wrapper'>
+                <h3>Radar Size</h3>
+                <input id='radar_range' 
+                    type='range'
+                    min=0
+                    max=100
+                    value=50 />
+                <br />
+                <span id='big_label' class='font_small grey_text'>
+                    Big 
+                </span>
+                <span id='small_label' class='font_small grey_text'>
+                    Small
+                </span>
+            </div>
+            <div id='radar'></div>
+        </div>
+    </div>
+
+    <div id='footer_wrapper'>
+        <div id='footer'>
+            <div id='console'>
+                <div id='console_text'>
+                    Starting Map Generation...
+                </div>
+                <div id='console_loading_bar'>
+                    <img src='img/ajax_loader.gif' />
+                </div> 
+                <div class='clear'></div>
+            </div>
+            <span class='email'>
+                liamg [ta] 1xeone
+            </span>
+            <a href='https://github.com/enoex'
+                title='My github page'
+                target='_blank'>github</a>
+            |
+            <a href='http://vasir.net/'
+                title='My personal website and blog'
+                target='_blank'>vasir.net</a>
+        </div>
+    </div>
+</div>
+
+<!-- =====================================================================
+
+     Javascript
+
+     ===================================================================== -->
+<!-- Third Party Scripts -->
+<script src='js/libs/jquery.js'></script>
+<script src='js/libs/d3/d3.js'></script>
+<script src='js/libs/d3/d3.geom.js'></script>
+<script src='js/libs/d3/d3.layout.js'></script>
+
+<!-- ====================================
+     Map generation
+     ==================================== -->
+<!-- TODO: Use google closure to compile all scripts into one -->
+<script src='js/radar/main.js'></script>
+<script src='js/radar/data.js'></script>
+<script src='js/radar/radar.js'></script>
+
+</body>
+</html>

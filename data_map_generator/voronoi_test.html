@@ -1,0 +1,83 @@
+<!doctype html> 
+<html lang='en'> 
+<head> 
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"> 
+    <title>Voronoi Tesselation</title> 
+    <script type="text/javascript" src="js/libs/d3/d3.js"></script> 
+    <script type="text/javascript" src="js/libs/d3/d3.geom.js"></script> 
+    <link type="text/css" rel="stylesheet" href="css/colorbrewer.css"/> 
+    <link type="text/css" rel="stylesheet" href="css/voronoi.css"/> 
+  </head> 
+  <body> 
+    <div id="chart"></div> 
+    <script>
+        var w = 400,
+        h = 400;
+
+        var vertices = d3.range(100).map(function(d) {
+          return [Math.random() * w, Math.random() * h];
+        });
+
+        var vertices_2 = [
+            [50,50],
+            [50,150],
+            [50,250],
+            [50,350],
+
+            [150,133],
+            [150,266],
+            [150,399],
+
+            [350,250],
+        ];
+
+        var svg = d3.select("#chart")
+          .append("svg")
+            .attr("width", w)
+            .attr("height", h)
+            .attr("class", "PiYG")
+            //.on("mousemove", update);
+
+        var diagram_1 = svg.append('g')
+            .attr('id', 'diagram_1');
+
+        diagram_1.selectAll("path")
+            .data(d3.geom.voronoi(vertices))
+          .enter().append("path")
+            .attr("class", function(d, i) { return i ? "q" + (i % 9) + "-9" : null; })
+            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+        var diagram_1_circles = svg.append('g')
+            .attr('id', 'diagram_1_circles');
+
+        diagram_1_circles.selectAll("circle")
+            .data(vertices.slice(1))
+          .enter().append("circle")
+            .attr("transform", function(d) { return "translate(" + d + ")"; })
+            .attr("r", 2);
+
+
+        // SECOND Voronoi Diagram
+        var diagram_2 = svg.append('g')
+            .attr('id', 'diagram_2');
+
+        diagram_2.selectAll("path")
+            .data(d3.geom.voronoi(vertices_2))
+          .enter().append("path")
+            .attr("class", function(d, i) { return i ? "q" + (i % 9) + "-9" : null; })
+            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+
+        /*
+        function update() {
+          vertices[0] = d3.svg.mouse(this);
+          svg.selectAll("path")
+              .data(d3.geom.voronoi(vertices)
+              .map(function(d) { return "M" + d.join("L") + "Z"; }))
+              .filter(function(d) { return this.getAttribute("d") != d; })
+              .attr("d", function(d) { return d; });
+        }
+        */
+    </script>
+  </body> 
+</html> 

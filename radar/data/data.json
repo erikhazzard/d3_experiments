@@ -1,0 +1,10 @@
+{
+    "data": { 
+        "fire": 42,
+        "water": 52,
+        "air": 30,
+        "earth": 28,
+        "light": 51,
+        "dark": 42
+    }
+}

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Convex Hull</title>
+    <script src='js/libs/d3/d3.js'></script>
+    <script src='js/libs/d3/d3.geom.js'></script>
+    <style type="text/css">
+
+svg {
+  border: solid 1px #aaa;
+  background: #eee;
+}
+
+path {
+  fill: lightsteelblue;
+  stroke: #000;
+}
+
+circle {
+  fill: #fff;
+  stroke: #000;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var w = 960,
+    h = 500;
+
+var vertices = d3.range(15).map(function(d) {
+  return [
+    w / 4 + Math.random() * w / 2,
+    h / 4 + Math.random() * h / 2
+  ];
+});
+
+/*
+vertices = [
+    [100,100],
+    [400,100],
+    [700,400],
+    [100,300]
+]
+ */
+
+var svg = d3.select("body")
+  .append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("pointer-events", "all")
+    .on("mousemove", move)
+    .on("click", click);
+
+update();
+
+function update() {
+  svg.selectAll("path")
+      .data([d3.geom.hull(vertices)])
+      .attr("d", function(d) { return generate_points(d) })
+	  .enter().append("svg:path")
+	    .attr("d", function(d) { return generate_points(d) });
+
+  svg.selectAll("circle")
+      .data(vertices.slice(1))
+    .enter().append("svg:circle")
+      .attr("transform", function(d) { return "translate(" + d + ")"; })
+      .attr("r", 3);
+}
+
+function generate_points(d){
+    //Country vertex contains the vertex for a single country
+    var country_vectex = [];
+    var jagged_step_amount = 10;
+    var jaggedness_factor = 10;
+
+    var use_x_coord = true;
+    var use_y_coord = true;
+    var jagged_vertex = [];
+
+    //Use x1, x2 and y1, y2 to keep things clearer
+    //  This gets set in the for loop below
+    var x1 = 0;
+    var x2 = 0;
+    var y1 = 0;
+    var y2 = 0;
+
+    var num_iteraions = 0;
+    var i_jagged = 0;
+
+
+    //We have the points for the convex hull already,
+    //  so let's randomize it a bit
+    //reset the variable
+    jagged_borders = [];
+
+    //Loop through the continent's vertices and
+    //  add them, along with intermediate points (to
+    //  create the jagged effect) to the jagged_borders
+    //  array
+    for(k=0, d_len=d.length; k < d_len; k++){
+
+        //Use x1, x2 and y1, y2 to keep things clearer
+        x1 = d[k][0];
+        y1 = d[k][1];
+
+        //Add the current vertex to the jagged_borders
+        jagged_borders.push([
+            x1,
+            y1
+        ]);
+
+        //If we're not at the final vertex, then add 
+        //  some points in between this vertex and the
+        //  next one
+        //if(k==2){
+
+        if(k + 1 < d_len){
+            //Set x2 and y2 to the next vertex coords
+            x2 = d[k+1][0];
+            y2 = d[k+1][1];
+        }else{
+            //We're at the final vertex so set the next
+            //  vertex to be the very first vertex of the set
+            x2 = d[0][0];
+            y2 = d[0][1];
+        }
+
+        //Add some random vertices
+        // We'll do this in a loop so we can add
+        // an arbitrary amount of jaggedness
+
+        //The way this works is we add a vertex
+        //  in between the current point and the
+        //  next one (this doesn't happen if we're 
+        //  at the last index
+        //The 'in between' points will be added
+        //  based on some 'step' variable (
+        //  as opposed to recursively getting
+        //  midpoints or something).  The step
+        //  variable will be either negative
+        //  or positive depending if the
+        //  next continent border vertex is
+        //  greater or less than the current
+        //  one
+        console.log(
+            '~~~~~~~~~~~~~~~~~~~');
+        console.log(x1,y1, '|||' ,x2,y2);
+        console.log(
+            '~~~~~~~~~~~~~~~~~~~');
+
+        //Get the number of iterations
+        //See if the X or Y is the 'limited' dimension (whatver
+        //  difference is larger, we'll use it to see how get the
+        //  number of iterations)
+        if(Math.abs(x1-x2) > Math.abs(y1-y2)){
+            //Get the number of iterations based on the X difference
+            num_iterations = (Math.abs(x1-x2) / jagged_step_amount);
+        }else{
+            //Same concept as above, but with X
+            //Get the number of iterations based on the Y difference
+            num_iterations = (Math.abs(y1-y2) / jagged_step_amount);
+        }
+        console.log('_____', num_iterations);
+
+        for(i_jagged=0;i_jagged<num_iterations;i_jagged++){
+            //We need to see which coords need to be checked.
+            //  For instance, if the coords look like
+            //  (19,0) to (22,0) then we don't need to check for
+            //  the y coord when we're doing the step comparisons.
+            //
+            //  The check uses whatever step factor that was
+            //  specified above
+            //
+            //  If vertex A (d[k]) and vertex B (d[k+1]) form a
+            //  straight line, then we only need to check for one
+            //  coord dimension (check for x if the line 
+            //  is horizontal, y if the line is vertical)
+            //
+            //  If they form a diagonal line, we need to check for
+            //  BOTH
+            check_x_coord = false;
+            check_y_coord = false;
+            //We need to keep track of if
+            //  the x and y coords should be used.
+            //  If the step_amount goes over the
+            //  next coordinates location, we dont
+            //  want to use it
+            use_x_coord = true;
+            use_y_coord = true;
+            
+            //xj is x1 + local_step_amount, which is defined in
+            // the checks below (xj might be negative)       
+            //Reset xj and yj to 0
+            yj = 0
+            xj = 0
+
+            //By default, the jagged_vertex
+            //will contain the next 
+            //  point's coords
+            jagged_vertex = [
+                x2,
+                y2
+            ];
+            
+            //The current step amount is equal to
+            //  the base step amount * the current
+            //  iteration
+            local_step_amount = (jagged_step_amount
+                * i_jagged);
+
+            //---------------
+            //Check for use_xy_coord variables
+            //---------------
+            //X
+            //-----------
+            //Check to see if we need to make the
+            //  step variable positive or negative
+            if(x1 < x2){
+                //Positive amount 
+                //Get xj 
+                xj = x1 + local_step_amount;
+                
+                //Set the check_x_coord variable 
+                //  The check is done by seeing if x1 plus the 
+                //  step amount exceeds x2.  If it doesn't, we
+                //  need to check the x coord
+                if(x1 + jagged_step_amount <= x2){
+                    check_x_coord = true
+
+                    //Check if this amount exceeds
+                    //  the next vertex
+                    //This is ignored if check_x_coord is false
+                    if(xj >= x2){
+                        //Dont use the x coord
+                        use_x_coord = false;
+                    }
+                }
+            }else{
+                //Negative amount
+                local_step_amount = (local_step_amount 
+                    * -1);
+                xj = x1 + local_step_amount;
+
+                //Set check_x_coord
+                //  Use greater than since we're using negative coords
+                if(x1 + (jagged_step_amount * -1) >= x2){
+                    check_x_coord = true;
+                }
+                //Set use_x_coord
+                if(xj <= x2){
+                    //Dont use the x coord
+                    use_x_coord = false;
+                }
+            }
+
+            //-----------
+            //Y
+            //-----------
+            //NOTE: Coord starts in top left, but this doesn't
+            //  affect the logic we need to do to compare y1 and y2
+            //reset local step count
+            local_step_amount = (jagged_step_amount
+                * i_jagged);
+
+            if(y1 < y2){
+                //Positive amount 
+                yj = y1 + local_step_amount;
+
+                //Set check_y_coord
+                if(y1 + jagged_step_amount <= y2){
+                    check_y_coord = true
+                }
+
+                //Set use_y_coord
+                if(yj >= y2){
+                    use_y_coord = false;
+                }
+            }else{
+                //Negative amount
+                local_step_amount = (local_step_amount 
+                    * -1);
+                yj = y1 + local_step_amount;
+                
+                //Set check_x_coord
+                //  Use greater than since we're using negative coords
+                if(y1 + (jagged_step_amount * -1) >= y2){
+                    check_y_coord = true;
+                }
+                if(yj <= y2){
+                    //Dont use the x coord
+                    use_y_coord = false;
+                }
+            }
+
+            //-----------------------
+            //
+            //Check for diagonal lines and set slope
+            //
+            //-----------------------
+            if(check_x_coord === true && check_y_coord === true){
+                //This is a diagonal line
+
+                //See if the X or Y is the 'limited' dimension (whatver
+                //  difference is larger, we'll use it to see how get the
+                //  number of iterations)
+                if(Math.abs(x1-x2) > Math.abs(y1-y2)){
+                    //Set yj.  Get the 'local step amount' (y1-y2 / num_iterations)
+                    yj = ( Math.abs(y1-y2) / num_iterations );
+                    //The current yj is based on current iteration
+                    yj = i_jagged * yj;
+                    //If y1 is >= y2, make yj negative
+                    if(y1>=y2) { yj *= -1 }
+                    //Set yj to be y1 + yj, which means set the current y value to
+                    //  be the yj we set above plus the starting y1 value
+                    yj = y1 + yj;
+                    //Because we just set yj, we will _always_ want to use it
+                    jagged_vertex[1] = yj;
+
+                }else{
+                    //Set xj.  Get the 'local step amount' 
+                    xj = ( Math.abs(x1-x2) / num_iterations );
+                    //The current xj is based on current iteration
+                    xj = i_jagged * xj;
+                    if(x1>=x2) { xj *= -1 }
+                    xj = xj + x1;
+                    jagged_vertex[0] = xj;
+                }
+            }
+
+            //-----------------------
+            //
+            //Setup jagged vertex
+            //
+            //-----------------------
+            //Note: Because we check for diagnoal lines above, this
+            //  will really only apply for horizontal or vertical lines
+            //Setup X and Y Coords for jagged_vertex
+            //  Determine if the base should be xj/yj
+            //  or if it should stay as x1 / x2 (for 
+            //  straight line segments)
+            if(check_x_coord === true){
+                if(use_x_coord === true){
+                    jagged_vertex[0] = xj;
+                }
+            }
+
+            if(check_y_coord === true){
+                if(use_y_coord === true){
+                    jagged_vertex[1] = yj;
+                }
+            }
+
+            //-----------------------
+            //Setup jagged vertex values
+            //-----------------------
+            jagged_vertex[0] += (
+                (jaggedness_factor * -1)
+                    + (Math.random() 
+                    * (jaggedness_factor * 2))
+                );
+
+
+            // Y Coord
+            jagged_vertex[1] += (
+                (jaggedness_factor * -1)
+                    + (Math.random() 
+                    * (jaggedness_factor * 2))
+                );
+
+
+            /*
+            console.log(
+                '----',
+                jagged_vertex,
+                'use x: ' + use_x_coord 
+                    + ', check x: ' + check_x_coord,
+                ' ||||| ',
+                'use y: ' + use_y_coord
+                    + ', check y: ' + check_y_coord
+            );
+            */
+
+            //It's ok to add another point, so do it!
+            jagged_borders.push(
+                [ jagged_vertex[0],
+                    jagged_vertex[1]
+                ]
+            );
+        }
+    }
+
+
+    //Return the path
+    return  'M' + jagged_borders.join('L') + 'Z';  
+
+}
+
+function move() {
+  //vertices[0] = d3.svg.mouse(this);
+  //update();
+}
+
+function click() {
+  //vertices.push(d3.svg.mouse(this));
+  //update();
+}
+    </script>
+  </body>
+</html>
